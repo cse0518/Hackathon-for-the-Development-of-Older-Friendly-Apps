@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<!-- Favicon  -->
+    <link rel="icon" href="images/doctor_icon.jpg">
+    <title>Video 입력창</title>
+    <style>
+        html, body{
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+        }
+
+        #camera, #camera--view, #camera--sensor, #camera--output{
+            position: fixed;
+            height: 55%;
+            width: 100%;
+            object-fit: none;
+        }
+
+        #camera--view, #camera--sensor, #camera--output{
+            transform: scaleX(-1);
+        }
+
+		#camera--end{
+		    width: 180px;
+            color: white;
+            background-color: #14bf98;
+            font-size: 16px;
+            border-radius: 0.25rem;
+            border: 0.125rem solid #14bf98;
+            padding: 20px 20px;
+            text-align: center;
+            box-shadow: 0 5px 10px 0 rgba(0,0,0,0, 0.2);
+            position: fixed;
+	        font: 700 0.75rem/0 "Montserrat", sans-serif;
+            bottom: 30px;
+            left: calc(50% - 90px);
+		}
+
+        .taken {
+            height: 140px!important;
+            width: 220px!important;
+            border: solid 2px rgb(121, 200, 253);
+        }
+    </style>
+</head>
+
+<body>
+    <main id="camera">
+        <canvas id="camera--sensor"></canvas>
+        <video id="camera--view" autoplay></video>
+        <button id="camera--trigger"></button>
+		<button id="camera--end" onClick="location.href='question.html'; return false;">영상 전송</button>
+    </main>
+    <script src="adapter.js"></script>
+    <script type="text/javascript">
+        let constraints = { video: { facingMode: "user"}, audio: true};
+        const cameraView = document.querySelector("#camera--view");
+        const cameraOutput = document.querySelector("#camera--output");
+        const cameraSensor = document.querySelector("#camera--sensor");
+        const cameraTrigger = document.querySelector("#camera--trigger");
+
+        function cameraStart(){
+            navigator.mediaDevices.getUserMedia(constraints).then(function(stream) {
+                track = stream.getTracks()[0];
+                cameraView.srcObject = stream;
+            })
+            .catch(function(error){
+                console.error("카메라에 문제가 있습니다.", error);
+            })
+        }
+
+        cameraTrigger.addEventListener("click", function() {
+            cameraSensor.width = cameraView.videoWidth;
+            cameraSensor.height = cameraView.videoHeight;
+            cameraSensor.getContext("2d").drawImage(cameraView, 0, 0);
+            cameraOutput.src = cameraSensor.toDataURL("image/webp");
+            cameraOutput.classList.add("taken");
+            console.log(cameraSensor.height);
+        });
+    
+        window.addEventListener("load", cameraStart, false);
+    </script>
+    
+</body>
+</html>
